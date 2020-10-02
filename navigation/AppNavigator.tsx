@@ -39,7 +39,8 @@ export type UserNavigatorParams = {
 const UserStackNavigator = createStackNavigator<UserNavigatorParams>();
 const UserNavigator = () => {
     return (
-        <UserStackNavigator.Navigator screenOptions={ defaultNavOptions }>
+        <UserStackNavigator.Navigator screenOptions={ defaultNavOptions }
+                                      headerMode="none">
             <UserStackNavigator.Screen
                 name="User"
                 component={ UserScreen }
