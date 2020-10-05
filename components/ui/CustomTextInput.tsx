@@ -18,7 +18,7 @@ const CustomTextInput = (props: TextInputProps) => {
 
     return (
         <TextInput {...props}
-                   style={[ styles.textInput, isFocused && styles.focused ]}
+                   style={[ styles.textInput, isFocused && styles.focused, props.style ]}
                    selectionColor={ COLORS.primary }
                    onFocus={ onFocus }
                    onBlur={ onBlur }/>
