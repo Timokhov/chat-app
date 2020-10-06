@@ -1,5 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { FlatList, ListRenderItemInfo, StyleSheet, TouchableNativeFeedback, View, ViewStyle } from 'react-native';
+import {
+    FlatList,
+    ListRenderItemInfo,
+    StyleSheet,
+    TouchableNativeFeedback,
+    View,
+    ViewStyle
+} from 'react-native';
 import { StackNavigationOptions, StackNavigationProp } from '@react-navigation/stack';
 import { ChatNavigatorParams } from '../../navigation/AppNavigator';
 import { RouteProp } from '@react-navigation/native';
@@ -117,6 +124,12 @@ const ChatScreen = (props: ChatScreenProps) => {
             dispatch(ChatActions.publishMessage(message));
         }
         setMessageText('');
+        if (messages.length > 0) {
+            flatListRef.current?.scrollToIndex({
+                animated: true,
+                index: 0
+            });
+        }
     };
 
     return (
