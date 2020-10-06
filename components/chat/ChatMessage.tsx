@@ -12,7 +12,7 @@ interface ChatMessageProps {
 const ChatMessage = (props: ChatMessageProps) => {
 
     const messageStyles: ViewStyle[] = [
-        styles.message,
+        styles.chatMessage,
         props.userMessage
             ? styles.currentUserMessage
             : styles.anotherUserMessage
@@ -25,32 +25,28 @@ const ChatMessage = (props: ChatMessageProps) => {
             : styles.anotherUserText
     ];
 
-    const infoStyle: ViewStyle = {
-        ...styles.info,
-        justifyContent: props.showSender || props.userMessage
-            ? 'space-between'
-            : 'flex-end'
-    };
+    const dateStyles: TextStyle[] = [
+        styles.date,
+        props.userMessage
+            ? styles.currentUserDate
+            : styles.anotherUserDate
+    ];
 
     return (
-        <View style={ styles.chatMessage }>
-            <View style={ infoStyle }>
-                {
-                    !props.userMessage && props.showSender && (
-                        <Text style={ styles.userName }>
-                            { props.message.user?.name }
-                        </Text>
-                    )
-                }
-                <Text style={ styles.date }>
-                    { props.message.dateString() }
-                </Text>
-            </View>
-            <View style={ messageStyles }>
-                <Text style={ messageTextStyles }>
-                    { props.message.text }
-                </Text>
-            </View>
+        <View style={ messageStyles }>
+            {
+                !props.userMessage && props.showSender && (
+                    <Text style={ styles.userName }>
+                        { props.message.user?.name }
+                    </Text>
+                )
+            }
+            <Text style={ messageTextStyles }>
+                { props.message.text }
+            </Text>
+            <Text style={ dateStyles }>
+                { props.message.dateString() }
+            </Text>
         </View>
     );
 };
@@ -58,25 +54,6 @@ const ChatMessage = (props: ChatMessageProps) => {
 const styles = StyleSheet.create({
     chatMessage: {
         width: '100%',
-        paddingHorizontal: 5
-    },
-    info: {
-        flexDirection: 'row',
-        alignItems: 'flex-end',
-        marginBottom: 3
-    },
-    userName: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: COLORS.textHighlight
-    },
-    date: {
-        fontSize: 10,
-        color: COLORS.common
-    },
-    message: {
-        flex: 1,
-        justifyContent: 'center',
         minHeight: 60,
         borderBottomLeftRadius: 10,
         borderBottomRightRadius: 10,
@@ -89,8 +66,12 @@ const styles = StyleSheet.create({
     },
     anotherUserMessage: {
         borderTopRightRadius: 10,
-        marginLeft: 10,
         backgroundColor: COLORS.common
+    },
+    userName: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: COLORS.primary
     },
     text: {
 
@@ -100,7 +81,18 @@ const styles = StyleSheet.create({
     },
     anotherUserText: {
 
+    },
+    date: {
+        alignSelf: 'flex-end',
+        fontSize: 10,
+        marginTop: 3
+    },
+    currentUserDate: {
+        color: COLORS.common
+    },
+    anotherUserDate: {
+        color: COLORS.textHighlight
     }
-})
+});
 
 export default ChatMessage;

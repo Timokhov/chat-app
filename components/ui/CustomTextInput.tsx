@@ -38,6 +38,6 @@ const styles = StyleSheet.create({
     focused: {
         borderColor: COLORS.primary,
     }
-})
+});
 
 export default CustomTextInput;

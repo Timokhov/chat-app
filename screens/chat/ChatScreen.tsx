@@ -43,6 +43,8 @@ const ChatScreen = (props: ChatScreenProps) => {
         dispatch(UserActions.clearUser());
     }, [dispatch]);
 
+    const flatListRef = useRef<FlatList>(null);
+
     useEffect(() => {
         props.navigation.setOptions({
             headerTitle: `Chatting as ${user?.name}`,
@@ -71,23 +73,12 @@ const ChatScreen = (props: ChatScreenProps) => {
     };
 
     const renderMessage = (itemInfo: ListRenderItemInfo<Message>): React.ReactElement => {
-        const message: Message = itemInfo.item
-        const userMessage: boolean = message.user?.id === user?.id;
-        const previousMessage: Nullable<Message> = itemInfo.index > 0 ? messages[itemInfo.index - 1] : null;
-        const previousMessageFromSameUser: boolean = previousMessage?.user.id === message.user.id;
-        const messageContainerStyle: ViewStyle = {
-            ...styles.messageContainer,
-            alignSelf:  userMessage ? 'flex-end' : 'flex-start',
-            marginTop: previousMessageFromSameUser ? 0 : 25,
-            padding: 0
-        };
-        return (
-            <View style={ messageContainerStyle }>
-                <ChatMessage message={ itemInfo.item }
-                             userMessage={ userMessage }
-                             showSender={ !previousMessageFromSameUser }/>
-            </View>
-        )
+        const message: Message = itemInfo.item;
+        if (MessageType.CHAT === message.type) {
+            return renderChatMessage(message, itemInfo.index);
+        } else {
+            return renderSystemMessage(message);
+        }
     };
 
     const renderChatMessage = (message: Message, index: number): React.ReactElement => {
@@ -125,13 +116,15 @@ const ChatScreen = (props: ChatScreenProps) => {
             const message = new Message(uuid(), MessageType.CHAT, user, messageText, new Date());
             dispatch(ChatActions.publishMessage(message));
         }
-        Keyboard.dismiss();
         setMessageText('');
     };
 
     return (
         <View style={ styles.screen }>
-            <FlatList data={ messages } renderItem={ renderMessage }/>
+            <FlatList ref={ flatListRef } contentContainerStyle={ styles.messagesList }
+                      data={ messages }
+                      renderItem={ renderMessage }
+                      inverted/>
             <View style={ styles.footer }>
                 <CustomTextInput style={ styles.input }
                                  placeholder="Type message"
@@ -188,10 +181,10 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         overflow: 'hidden'
     }
-})
+});
 
 export const chatScreenNavigationOptions = (props: ChatScreenProps): StackNavigationOptions => {
     return {}
-}
+};
 
 export default ChatScreen;

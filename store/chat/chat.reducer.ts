@@ -10,8 +10,10 @@ const initialState: ChatState = {
 };
 
 const onPublishMessage = (state: ChatState, action: PublishMessageAction): ChatState => {
+    const changedMessaged: Message[] = [ ...state.messages ];
+    changedMessaged.unshift(action.message);
     return {
-        messages: state.messages.concat(action.message)
+        messages: changedMessaged
     };
 };
 
