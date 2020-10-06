@@ -1,10 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import {
-    View,
-    StyleSheet,
-    TouchableNativeFeedback,
-    FlatList, ListRenderItemInfo, ViewStyle, Keyboard
-} from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { FlatList, ListRenderItemInfo, StyleSheet, TouchableNativeFeedback, View, ViewStyle } from 'react-native';
 import { StackNavigationOptions, StackNavigationProp } from '@react-navigation/stack';
 import { ChatNavigatorParams } from '../../navigation/AppNavigator';
 import { RouteProp } from '@react-navigation/native';
@@ -23,6 +18,8 @@ import { Message } from '../../models/message';
 import ChatMessage from '../../components/chat/ChatMessage';
 import { v4 as uuid } from 'uuid';
 import * as ChatActions from '../../store/chat/chat.actions';
+import { MessageType } from '../../models/message-type';
+import SystemMessage from '../../components/chat/SystemMessage';
 
 type ChatScreenStackNavigationProp = StackNavigationProp<ChatNavigatorParams, 'Chat'>;
 type ChatScreenRouteProp = RouteProp<ChatNavigatorParams, 'Chat'>;
@@ -59,6 +56,14 @@ const ChatScreen = (props: ChatScreenProps) => {
                 );
             }
         });
+
+        const enterMessage = new Message(uuid(), MessageType.SYSTEM, null, `${ user?.name } has entered the chat`, new Date());
+        dispatch(ChatActions.publishMessage(enterMessage));
+
+        return () => {
+            const enterMessage = new Message(uuid(), MessageType.SYSTEM, null, `${ user?.name } has left the chat`, new Date());
+            dispatch(ChatActions.publishMessage(enterMessage));
+        }
     }, []);
 
     const onMessageTextChange = (newText: string) => {
@@ -85,14 +90,39 @@ const ChatScreen = (props: ChatScreenProps) => {
         )
     };
 
+    const renderChatMessage = (message: Message, index: number): React.ReactElement => {
+        const userMessage: boolean = message.user?.id === user?.id;
+        const previousMessage: Nullable<Message> = index < messages.length ? messages[index + 1] : null;
+        const previousMessageFromSameUser: boolean = previousMessage?.user?.id === message.user?.id;
+        const previousMessageSystem: boolean = MessageType.SYSTEM === previousMessage?.type;
+        const messageContainerStyle: ViewStyle = {
+            ...styles.chatMessageContainer,
+            alignSelf:  userMessage ? 'flex-end' : 'flex-start',
+            alignItems: userMessage ? 'flex-end' : 'flex-start',
+            marginTop: previousMessageFromSameUser || previousMessageSystem ? 0 : 25,
+            marginBottom: index === 0 ? 25 : 5,
+            paddingHorizontal: 10
+        };
+        return (
+            <View style={ messageContainerStyle }>
+                <ChatMessage message={ message }
+                             userMessage={ userMessage }
+                             showSender={ !previousMessageFromSameUser || previousMessageSystem }/>
+            </View>
+        );
+    };
+
+    const renderSystemMessage = (message: Message): React.ReactElement => {
+        return (
+            <View style={ styles.systemMessageContainer }>
+                <SystemMessage message={ message }/>
+            </View>
+        );
+    };
+
     const publishMessage = () => {
         if (user) {
-            const message = new Message(
-                uuid(),
-                user,
-                messageText,
-                new Date()
-            );
+            const message = new Message(uuid(), MessageType.CHAT, user, messageText, new Date());
             dispatch(ChatActions.publishMessage(message));
         }
         Keyboard.dismiss();
@@ -122,9 +152,19 @@ const styles = StyleSheet.create({
     screen: {
         flex: 1
     },
-    messageContainer: {
-        width: '80%',
-        marginBottom: 5
+    messagesList: {
+        flexGrow: 1,
+        justifyContent: 'flex-end'
+    },
+    chatMessageContainer: {
+        maxWidth: '80%'
+    },
+    systemMessageContainer: {
+        width: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 40,
+        marginVertical: 15
     },
     footer: {
         borderTopWidth: 1,
