@@ -31,9 +31,6 @@ const UserScreen = (props: UserScreenProps) => {
     const [name, setName] = useState('');
 
     const dispatch: Dispatch<Action> = useDispatch();
-    const dispatchSetUser = useCallback(() => {
-        dispatch(UserActions.setUser({ id: uuid(), name: name }));
-    }, [dispatch, name]);
 
     useEffect(() => {
         const keyboardWillShowSub: EmitterSubscription = Keyboard.addListener('keyboardDidShow', onKeyboardWillShow);
@@ -59,6 +56,10 @@ const UserScreen = (props: UserScreenProps) => {
         setName(newName);
     };
 
+    const onEnterChat = () => {
+        dispatch(UserActions.enterChat({ id: uuid(), name: name }));
+    };
+
     return (
         <TouchableWithoutFeedback onPress={ Keyboard.dismiss }>
             <KeyboardAvoidingView style={ styles.screen }>
@@ -68,7 +69,7 @@ const UserScreen = (props: UserScreenProps) => {
                     <CustomTextInput placeholder="Please Enter Your Name"
                                      onChangeText={ onNameInputChange }/>
                     <View style={ styles.buttonContainer }>
-                        <CustomButton onPress={ dispatchSetUser } disabled={ !name }/>
+                        <CustomButton onPress={ onEnterChat } disabled={ !name }/>
                     </View>
                 </View>
             </KeyboardAvoidingView>
@@ -103,10 +104,10 @@ const styles = StyleSheet.create({
         width: '100%',
         marginTop: 20
     }
-})
+});
 
 export const userScreenNavigationOptions = (props: UserScreenProps): StackNavigationOptions => {
     return {}
-}
+};
 
 export default UserScreen;

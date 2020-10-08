@@ -45,7 +45,7 @@ const ChatMessage = (props: ChatMessageProps) => {
                 { props.message.text }
             </Text>
             <Text style={ dateStyles }>
-                { props.message.dateString() }
+                { props.message.date }
             </Text>
         </View>
     );

@@ -1,4 +1,4 @@
 export enum MessageType {
-    CHAT,
-    SYSTEM
+    CHAT = 'CHAT',
+    SYSTEM = 'SYSTEM'
 }
