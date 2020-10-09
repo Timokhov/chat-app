@@ -1,5 +1,5 @@
 import SockJS from 'sockjs-client';
-import { Client, IMessage } from '@stomp/stompjs';
+import { Client, IMessage, StompHeaders } from '@stomp/stompjs';
 import { StompSubscription } from '@stomp/stompjs/esm5/stomp-subscription';
 import { Nullable } from '../models/nullable';
 
@@ -55,14 +55,16 @@ export const disconnectFromWebSocket = () => {
     }
 };
 
-export const subscribeToTopic = <T>(url: string, handleData: (data: T) => void): Nullable<StompSubscription> => {
+export const subscribeToTopic = <T>(url: string, handleData: (data: T) => void, headers?: StompHeaders): Nullable<StompSubscription> => {
     if (client) {
-        return client.subscribe(url, (message: IMessage) => {
+        const onMessageReceive = (message: IMessage) => {
             if (message.body) {
                 const data: T = JSON.parse(message.body);
                 handleData(data);
             }
-        });
+        };
+
+        return client.subscribe(url, onMessageReceive, headers);
     } else {
         return null;
     }

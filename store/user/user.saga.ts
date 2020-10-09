@@ -10,7 +10,7 @@ export function* watchUserSaga() {
 
 function* enterChatSaga(action: EnterChatAction) {
     yield put(UserActions.setUser(action.user));
-    yield put(ChatActions.subscribeToChatTopic('/topic/chat/messages'));
+    yield put(ChatActions.subscribeToChatTopic('/topic/chat/messages', action.user));
 }
 
 function* leaveChatSaga() {

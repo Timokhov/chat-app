@@ -1,5 +1,6 @@
 import { Action } from 'redux';
 import { Message } from '../../models/message';
+import { User } from '../../models/user';
 
 export enum ChatActionType {
     SUBSCRIBE_TO_CHAT_TOPIC = 'SUBSCRIBE_TO_CHAT_TOPIC',
@@ -14,17 +15,19 @@ export enum ChatActionType {
 export interface ChatAction extends Action<ChatActionType> {}
 
 export interface SubscribeToChatTopicAction extends ChatAction {
-    url: string
+    url: string,
+    user: User
 }
 
 export interface ReceiveChatMessageAction extends ChatAction {
     message: Message
 }
 
-export const subscribeToChatTopic = (url: string): SubscribeToChatTopicAction => {
+export const subscribeToChatTopic = (url: string, user: User): SubscribeToChatTopicAction => {
     return {
         type: ChatActionType.SUBSCRIBE_TO_CHAT_TOPIC,
-        url: url
+        url: url,
+        user: user
     };
 };
 
