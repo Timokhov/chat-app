@@ -9,6 +9,9 @@ export enum ChatActionType {
     UNSUBSCRIBE_FROM_CHAT_TOPIC = 'UNSUBSCRIBE_FROM_CHAT_TOPIC',
     UNSUBSCRIBE_FROM_CHAT_TOPIC_FINISH = 'UNSUBSCRIBE_FROM_CHAT_TOPIC_FINISH',
 
+    CHAT_SCROLLED = 'CHAT_SCROLLED',
+    READ_MESSAGES = 'READ_MESSAGES',
+
     RECEIVE_CHAT_MESSAGE = 'RECEIVE_CHAT_MESSAGE'
 }
 
@@ -21,6 +24,14 @@ export interface SubscribeToChatTopicAction extends ChatAction {
 
 export interface ReceiveChatMessageAction extends ChatAction {
     message: Message
+}
+
+export interface ChatScrolledAction extends ChatAction {
+    isScrollAtBottom: boolean
+}
+
+export interface ReadMessagesAction extends ChatAction {
+    idList: string[]
 }
 
 export const subscribeToChatTopic = (url: string, user: User): SubscribeToChatTopicAction => {
@@ -52,6 +63,20 @@ export const unsubscribeFromChatTopic = (): ChatAction => {
 export const unsubscribeToChatTopicFinish = (): ChatAction => {
     return {
         type: ChatActionType.UNSUBSCRIBE_FROM_CHAT_TOPIC_FINISH,
+    };
+};
+
+export const chatScrolled = (isScrollAtBottom: boolean): ChatScrolledAction => {
+    return {
+        type: ChatActionType.CHAT_SCROLLED,
+        isScrollAtBottom: isScrollAtBottom
+    };
+};
+
+export const readMessages = (idList: string[]): ReadMessagesAction => {
+    return {
+        type: ChatActionType.READ_MESSAGES,
+        idList: idList
     };
 };
 

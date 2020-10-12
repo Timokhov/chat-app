@@ -1,14 +1,25 @@
-import React, { useRef, forwardRef, useImperativeHandle } from 'react';
-import { FlatList, ListRenderItemInfo, StyleSheet, View, ViewStyle } from 'react-native';
-import { useSelector } from 'react-redux';
+import React, { useRef, forwardRef, useImperativeHandle, useCallback } from 'react';
+import {
+    FlatList,
+    ListRenderItemInfo,
+    NativeScrollEvent,
+    NativeSyntheticEvent,
+    StyleSheet,
+    View,
+    ViewStyle, ViewToken
+} from 'react-native';
+import { Action, Dispatch } from 'redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Message } from '../../models/message';
 import { MessageType } from '../../models/message-type';
 import { Nullable } from '../../models/nullable';
 import { User } from '../../models/user';
-
 import { RootState } from '../../store/store';
 import ChatMessage from './ChatMessage';
 import SystemMessage from './SystemMessage';
+import * as ChatActions from '../../store/chat/chat.actions';
+import ToBottomButton from '../ui/ToBottomButton';
+import CountBadge from '../ui/CountBadge';
 
 interface ChatMessagesListProps {}
 
@@ -21,25 +32,40 @@ const ChatMessagesList = forwardRef<ChatMessagesListRef>((props: ChatMessagesLis
     const user: Nullable<User> = useSelector(
         (state: RootState) => state.userState.user
     );
+    const isScrollAtBottom: boolean = useSelector(
+        (state: RootState) => state.chatState.isScrollAtBottom
+    );
     const messages: Message[] = useSelector(
         (state: RootState) => state.chatState.messages
     );
+    const unreadMessagesIdList: string[] = useSelector(
+        (state: RootState) => state.chatState.unreadMessagesIdList
+    );
+
+    const dispatch: Dispatch<Action> = useDispatch();
 
     const flatListRef = useRef<FlatList>(null);
+    const onViewableItemsChangedRef = useRef((info: { viewableItems: Array<ViewToken>; changed: Array<ViewToken> }) => {
+        const readMessagesIdList: string[] = info.changed.map(token => token.key);
+        dispatch(ChatActions.readMessages(readMessagesIdList));
+    });
+    const viewConfigRef = useRef({ viewAreaCoveragePercentThreshold: 20 });
+
+    const scrollToBottom = useCallback(() => {
+        if (messages.length > 0) {
+            flatListRef.current?.scrollToIndex({
+                animated: true,
+                index: 0
+            });
+        }
+    }, [messages]);
 
     useImperativeHandle<ChatMessagesListRef, ChatMessagesListRef>(
         ref,
         () => ({
-            scrollToBottom: () => {
-                if (messages.length > 0) {
-                    flatListRef.current?.scrollToIndex({
-                        animated: true,
-                        index: 0
-                    });
-                }
-            }
+            scrollToBottom: scrollToBottom
         }),
-        [messages]
+        [scrollToBottom]
     );
 
     const renderMessage = (itemInfo: ListRenderItemInfo<Message>): React.ReactElement => {
@@ -81,12 +107,40 @@ const ChatMessagesList = forwardRef<ChatMessagesListRef>((props: ChatMessagesLis
         );
     };
 
-    return <FlatList ref={ flatListRef }
-                     contentContainerStyle={ styles.chatMessagesList }
-                     data={ messages }
-                     renderItem={ renderMessage }
-                     inverted/>
+    const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+        const yOffset: number = event.nativeEvent.contentOffset.y;
+        if (!isScrollAtBottom &&  yOffset < 20) {
+            dispatch(ChatActions.chatScrolled(true));
+        }
 
+        if (isScrollAtBottom && yOffset > 20) {
+            dispatch(ChatActions.chatScrolled(false));
+        }
+    }
+
+    return (
+        <View style={{ flex: 1 }}>
+            <FlatList ref={ flatListRef }
+                      contentContainerStyle={ styles.chatMessagesList }
+                      data={ messages }
+                      renderItem={ renderMessage }
+                      onScroll={ onScroll }
+                      viewabilityConfig={ viewConfigRef.current }
+                      onViewableItemsChanged={ onViewableItemsChangedRef.current }
+                      inverted/>
+            {
+                !isScrollAtBottom && (
+                    <View style={ styles.toBottomButtonContainer }>
+                        <ToBottomButton onPress={ scrollToBottom }/>
+                        {
+                            unreadMessagesIdList.length > 0 && <CountBadge style={ styles.unreadMessagesCountBadge }
+                                                                       count={ unreadMessagesIdList.length }/>
+                        }
+                    </View>
+                )
+            }
+        </View>
+    );
 });
 
 const styles = StyleSheet.create({
@@ -103,6 +157,17 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 40,
         marginVertical: 15
+    },
+    toBottomButtonContainer: {
+        position: 'absolute',
+        justifyContent: 'center',
+        alignItems: 'center',
+        bottom: 10,
+        right: 10
+    },
+    unreadMessagesCountBadge: {
+        position: 'absolute',
+        top: -10
     }
 });
 
