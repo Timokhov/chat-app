@@ -29,6 +29,9 @@ export interface ChatMessagesListRef {
 
 const ChatMessagesList = forwardRef<ChatMessagesListRef>((props: ChatMessagesListProps, ref) => {
 
+    //const [scrollPosition, setScrollPosition] = useState(0);
+    //const [contentHeight, setContentHeight] = useState(0);
+
     const user: Nullable<User> = useSelector(
         (state: RootState) => state.userState.user
     );
@@ -49,7 +52,7 @@ const ChatMessagesList = forwardRef<ChatMessagesListRef>((props: ChatMessagesLis
         const readMessagesIdList: string[] = info.changed.map(token => token.key);
         dispatch(ChatActions.readMessages(readMessagesIdList));
     });
-    const viewConfigRef = useRef({ viewAreaCoveragePercentThreshold: 20 });
+    const viewConfigRef = useRef({ viewAreaCoveragePercentThreshold: 10 });
 
     const scrollToBottom = useCallback(() => {
         if (messages.length > 0) {
@@ -116,7 +119,17 @@ const ChatMessagesList = forwardRef<ChatMessagesListRef>((props: ChatMessagesLis
         if (isScrollAtBottom && yOffset > 20) {
             dispatch(ChatActions.chatScrolled(false));
         }
+        //setScrollPosition(yOffset);
     }
+
+    //todo maintein scroll position on new message https://github.com/facebook/react-native/issues/25239
+    /*const onContentSizeChanged = (w: number, h: number) => {
+        if (!isScrollAtBottom) {
+            const newScrollPosition: number = scrollPosition + (h - contentHeight);
+            flatListRef.current?.scrollToOffset({ animated: false, offset: newScrollPosition });
+        }
+        setContentHeight(h);
+    }*/
 
     return (
         <View style={{ flex: 1 }}>
