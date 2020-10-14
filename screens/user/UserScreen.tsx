@@ -53,7 +53,7 @@ const UserScreen = (props: UserScreenProps) => {
     };
 
     const onNameInputChange = (newName: string) => {
-        setName(newName);
+        setName(newName.trim());
     };
 
     const onEnterChat = () => {

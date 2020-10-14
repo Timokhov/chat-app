@@ -4,16 +4,16 @@ import { View, StyleSheet, TouchableNativeFeedback } from 'react-native';
 import { useSelector } from 'react-redux';
 import { v4 as uuid } from 'uuid';
 import { COLORS } from '../../constants/colors';
-import { Message } from '../../models/message';
-import { MessageType } from '../../models/message-type';
+import { ChatMessage, ChatMessageType } from '../../models/message';
 import { Nullable } from '../../models/nullable';
 import { User } from '../../models/user';
 import * as DateService from '../../services/date.service';
 import { RootState } from '../../store/store';
 import CustomTextInput from '../ui/CustomTextInput';
+import * as WebSocketService from '../../services/web-socket.service';
 
 interface ChatMessageInputProps {
-    onSend: (message: Message) => void
+    afterPublishChatMessage?: () => void;
 }
 
 const ChatMessageInput = (props: ChatMessageInputProps) => {
@@ -24,19 +24,33 @@ const ChatMessageInput = (props: ChatMessageInputProps) => {
         (state: RootState) => state.userState.user
     );
 
-    const onSend = () => {
+    const onPublishChatMessage = () => {
         if (messageText) {
-            const message: Message = {
+            const message: ChatMessage = {
                 id: uuid(),
-                type: MessageType.CHAT,
+                type: ChatMessageType.CHAT,
                 user: user,
                 text: messageText,
                 date: DateService.dateToString(new Date())
             };
-            props.onSend(message);
+
+            WebSocketService.publish('/topic/chat/publish/message', message);
+            props.afterPublishChatMessage && props.afterPublishChatMessage();
             setMessageText('');
         }
     };
+
+    const onTypingStart = () => {
+        if (user) {
+            WebSocketService.publish('/topic/chat/publish/start-typing', user);
+        }
+    }
+
+    const onTypingStop = () => {
+        if (user) {
+            WebSocketService.publish('/topic/chat/publish/stop-typing', null);
+        }
+    }
 
     return (
         <View style={ styles.chatMessageInput }>
@@ -44,8 +58,10 @@ const ChatMessageInput = (props: ChatMessageInputProps) => {
                              placeholder="Type message"
                              multiline
                              value={ messageText }
-                             onChangeText={ setMessageText }/>
-            <TouchableNativeFeedback onPress={ onSend } useForeground>
+                             onChangeText={ setMessageText }
+                             onFocus={ onTypingStart }
+                             onBlur={ onTypingStop }/>
+            <TouchableNativeFeedback onPress={ onPublishChatMessage } useForeground>
                 <View style={ styles.sendButton }>
                     <Ionicons name="ios-send" size={ 40 } color={ COLORS.primary }/>
                 </View>

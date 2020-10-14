@@ -10,16 +10,21 @@ import {
 } from 'react-native';
 import { Action, Dispatch } from 'redux';
 import { useDispatch, useSelector } from 'react-redux';
-import { Message } from '../../models/message';
-import { MessageType } from '../../models/message-type';
+import { ChatMessage, ChatMessageType } from '../../models/message';
 import { Nullable } from '../../models/nullable';
 import { User } from '../../models/user';
 import { RootState } from '../../store/store';
-import ChatMessage from './ChatMessage';
-import SystemMessage from './SystemMessage';
+import ChatMessageComponent from './ChatMessageComponent';
+import SystemChatMessageComponent from './SystemChatMessageComponent';
 import * as ChatActions from '../../store/chat/chat.actions';
 import ToBottomButton from '../ui/ToBottomButton';
 import CountBadge from '../ui/CountBadge';
+import TypingNotification from './TypingNotification';
+
+interface ViewableItemsChangedInfo {
+    viewableItems: Array<ViewToken>;
+    changed: Array<ViewToken>
+}
 
 interface ChatMessagesListProps {}
 
@@ -38,30 +43,34 @@ const ChatMessagesList = forwardRef<ChatMessagesListRef>((props: ChatMessagesLis
     const isScrollAtBottom: boolean = useSelector(
         (state: RootState) => state.chatState.isScrollAtBottom
     );
-    const messages: Message[] = useSelector(
-        (state: RootState) => state.chatState.messages
+    const chatMessages: ChatMessage[] = useSelector(
+        (state: RootState) => state.chatState.chatMessages
     );
-    const unreadMessagesIdList: string[] = useSelector(
-        (state: RootState) => state.chatState.unreadMessagesIdList
+    const unreadChatMessagesIdList: string[] = useSelector(
+        (state: RootState) => state.chatState.unreadChatMessagesIdList
     );
+    const typingNotification: string = useSelector(
+        (state: RootState) => state.chatState.typingNotification
+    )
 
     const dispatch: Dispatch<Action> = useDispatch();
 
     const flatListRef = useRef<FlatList>(null);
-    const onViewableItemsChangedRef = useRef((info: { viewableItems: Array<ViewToken>; changed: Array<ViewToken> }) => {
+
+    const onViewableItemsChangedRef = useRef((info: ViewableItemsChangedInfo) => {
         const readMessagesIdList: string[] = info.changed.map(token => token.key);
         dispatch(ChatActions.readMessages(readMessagesIdList));
     });
     const viewConfigRef = useRef({ viewAreaCoveragePercentThreshold: 10 });
 
     const scrollToBottom = useCallback(() => {
-        if (messages.length > 0) {
-            flatListRef.current?.scrollToIndex({
+        if (chatMessages.length > 0) {
+            flatListRef.current?.scrollToOffset({
                 animated: true,
-                index: 0
+                offset: 0
             });
         }
-    }, [messages]);
+    }, [chatMessages]);
 
     useImperativeHandle<ChatMessagesListRef, ChatMessagesListRef>(
         ref,
@@ -71,41 +80,41 @@ const ChatMessagesList = forwardRef<ChatMessagesListRef>((props: ChatMessagesLis
         [scrollToBottom]
     );
 
-    const renderMessage = (itemInfo: ListRenderItemInfo<Message>): React.ReactElement => {
-        const message: Message = itemInfo.item;
-        if (MessageType.CHAT === message.type) {
+    const renderMessage = (itemInfo: ListRenderItemInfo<ChatMessage>): React.ReactElement => {
+        const message: ChatMessage = itemInfo.item;
+        if (ChatMessageType.CHAT === message.type) {
             return renderChatMessage(message, itemInfo.index);
         } else {
             return renderSystemMessage(message);
         }
     };
 
-    const renderChatMessage = (message: Message, index: number): React.ReactElement => {
+    const renderChatMessage = (message: ChatMessage, index: number): React.ReactElement => {
         const isUserMessage: boolean = message.user?.id === user?.id;
-        const previousMessage: Nullable<Message> = index < messages.length ? messages[index + 1] : null;
+        const previousMessage: Nullable<ChatMessage> = index < chatMessages.length ? chatMessages[index + 1] : null;
         const isPreviousMessageFromSameUser: boolean = previousMessage?.user?.id === message.user?.id;
-        const isPreviousMessageSystem: boolean = MessageType.SYSTEM === previousMessage?.type;
+        const isPreviousMessageSystem: boolean = ChatMessageType.SYSTEM === previousMessage?.type;
         const messageContainerStyle: ViewStyle = {
             ...styles.chatMessageContainer,
             alignSelf:  isUserMessage ? 'flex-end' : 'flex-start',
             alignItems: isUserMessage ? 'flex-end' : 'flex-start',
             marginTop: isPreviousMessageFromSameUser || isPreviousMessageSystem ? 0 : 25,
-            marginBottom: index === 0 ? 25 : 5,
+            marginBottom: index === 0 ? 10 : 5,
             paddingHorizontal: 10
         };
         return (
             <View style={ messageContainerStyle }>
-                <ChatMessage message={ message }
+                <ChatMessageComponent message={ message }
                              userMessage={ isUserMessage }
                              showSender={ !isPreviousMessageFromSameUser || isPreviousMessageSystem }/>
             </View>
         );
     };
 
-    const renderSystemMessage = (message: Message): React.ReactElement => {
+    const renderSystemMessage = (message: ChatMessage): React.ReactElement => {
         return (
             <View style={ styles.systemMessageContainer }>
-                <SystemMessage message={ message }/>
+                <SystemChatMessageComponent message={ message }/>
             </View>
         );
     };
@@ -135,19 +144,24 @@ const ChatMessagesList = forwardRef<ChatMessagesListRef>((props: ChatMessagesLis
         <View style={{ flex: 1 }}>
             <FlatList ref={ flatListRef }
                       contentContainerStyle={ styles.chatMessagesList }
-                      data={ messages }
+                      data={ chatMessages }
                       renderItem={ renderMessage }
                       onScroll={ onScroll }
                       viewabilityConfig={ viewConfigRef.current }
                       onViewableItemsChanged={ onViewableItemsChangedRef.current }
+                      ListHeaderComponent={ typingNotification
+                          ?  <TypingNotification notification={typingNotification}/>
+                          : null
+                      }
+                      ListFooterComponentStyle={{ padding: 0, margin: 0 }}
                       inverted/>
             {
                 !isScrollAtBottom && (
                     <View style={ styles.toBottomButtonContainer }>
                         <ToBottomButton onPress={ scrollToBottom }/>
                         {
-                            unreadMessagesIdList.length > 0 && <CountBadge style={ styles.unreadMessagesCountBadge }
-                                                                       count={ unreadMessagesIdList.length }/>
+                            unreadChatMessagesIdList.length > 0 && <CountBadge style={ styles.unreadMessagesCountBadge }
+                                                                       count={ unreadChatMessagesIdList.length }/>
                         }
                     </View>
                 )

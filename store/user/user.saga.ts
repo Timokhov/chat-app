@@ -10,10 +10,12 @@ export function* watchUserSaga() {
 
 function* enterChatSaga(action: EnterChatAction) {
     yield put(UserActions.setUser(action.user));
-    yield put(ChatActions.subscribeToChatTopic('/topic/chat/messages', action.user));
+    yield put(ChatActions.subscribeToChatTopic(action.user));
+    yield put(ChatActions.subscribeToTypingTopic(action.user));
 }
 
 function* leaveChatSaga() {
     yield put(UserActions.clearUser());
     yield put(ChatActions.unsubscribeFromChatTopic());
+    yield put(ChatActions.unsubscribeFromTypingTopic());
 }

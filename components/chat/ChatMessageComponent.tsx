@@ -1,15 +1,15 @@
 import React from 'react';
-import { Message } from '../../models/message';
+import { ChatMessage } from '../../models/message';
 import { View, StyleSheet, Text, ViewStyle, TextStyle } from 'react-native';
 import { COLORS } from '../../constants/colors';
 
 interface ChatMessageProps {
-    message: Message,
+    message: ChatMessage,
     userMessage: boolean,
     showSender: boolean
 }
 
-const ChatMessage = (props: ChatMessageProps) => {
+const ChatMessageComponent = (props: ChatMessageProps) => {
 
     const messageStyles: ViewStyle[] = [
         styles.chatMessage,
@@ -95,4 +95,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default ChatMessage;
+export default ChatMessageComponent;

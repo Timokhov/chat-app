@@ -1,6 +1,6 @@
 import { createStore, combineReducers, Reducer, CombinedState, Store, applyMiddleware } from 'redux';
 import createSagaMiddleware from 'redux-saga';
-import { watchChatSaga } from './chat/chat.saga';
+import { watchChatSaga, watchTypingSaga } from './chat/chat.saga';
 import userReducer, { UserState } from './user/user.reducer';
 import chatReducer, { ChatState } from './chat/chat.reducer';
 import { watchUserSaga } from './user/user.saga';
@@ -28,3 +28,4 @@ export const store: Store = createStore(rootReducer, applyMiddleware(sagaMiddlew
 sagaMiddleware.run(watchWebSocketSaga);
 sagaMiddleware.run(watchUserSaga);
 sagaMiddleware.run(watchChatSaga);
+sagaMiddleware.run(watchTypingSaga);

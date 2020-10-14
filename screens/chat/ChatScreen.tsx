@@ -12,15 +12,13 @@ import { RouteProp } from '@react-navigation/native';
 import { Nullable } from '../../models/nullable';
 import { User } from '../../models/user';
 import { useDispatch, useSelector } from 'react-redux';
-import { ChatTopicSubscriptionStatus } from '../../store/chat/chat.reducer';
+import { SubscriptionStatus } from '../../store/chat/chat.reducer';
 import { RootState } from '../../store/store';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import CustomHeaderButton from '../../components/ui/CustomHeaderButton';
 import { Action, Dispatch } from 'redux';
 import * as UserActions from '../../store/user/user.actions';
 import { COLORS } from '../../constants/colors';
-import { Message } from '../../models/message';
-import * as WebSocketService from '../../services/web-socket.service';
 
 type ChatScreenStackNavigationProp = StackNavigationProp<ChatNavigatorParams, 'Chat'>;
 type ChatScreenRouteProp = RouteProp<ChatNavigatorParams, 'Chat'>;
@@ -34,7 +32,7 @@ const ChatScreen = (props: ChatScreenProps) => {
         (state: RootState) => state.userState.user
     );
     const chatTopicSubscriptionStatus = useSelector(
-        (state: RootState) => state.chatState.subscriptionStatus
+        (state: RootState) => state.chatState.chatSubscriptionStatus
     );
 
     const dispatch: Dispatch<Action> = useDispatch();
@@ -60,18 +58,17 @@ const ChatScreen = (props: ChatScreenProps) => {
         }
     }, []);
 
-    const publishMessage = (message: Message) => {
-        WebSocketService.publish('/topic/chat/publish', message);
+    const afterPublishChatMessage = () => {
         chatMessageListRef.current?.scrollToBottom();
     };
 
     let content: React.ReactElement = <ScreenLoader/>;
-    if (ChatTopicSubscriptionStatus.SUBSCRIBED === chatTopicSubscriptionStatus) {
+    if (SubscriptionStatus.SUBSCRIBED === chatTopicSubscriptionStatus) {
         content = (
             <View style={ styles.screen }>
                 <ChatMessagesList ref={ chatMessageListRef }/>
                 <View style={ styles.footer }>
-                    <ChatMessageInput onSend={ publishMessage }/>
+                    <ChatMessageInput afterPublishChatMessage={ afterPublishChatMessage }/>
                 </View>
             </View>
         );

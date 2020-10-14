@@ -1,11 +1,22 @@
 import { User } from './user';
-import { MessageType } from './message-type';
 import { Nullable } from './nullable';
 
 export interface Message {
-    id: string,
-    type: MessageType,
-    user: Nullable<User>,
-    text: string,
-    date: string
+    id: string;
+    date: string;
+}
+
+export enum ChatMessageType {
+    CHAT = 'CHAT',
+    SYSTEM = 'SYSTEM'
+}
+
+export interface ChatMessage extends Message {
+    type: ChatMessageType;
+    user: Nullable<User>;
+    text: string;
+}
+
+export interface TypingMessage extends Message {
+    typingUsers: User[];
 }

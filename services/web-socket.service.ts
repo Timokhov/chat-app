@@ -70,8 +70,8 @@ export const subscribeToTopic = <T>(url: string, handleData: (data: T) => void, 
     }
 };
 
-export const publish = <T>(topicUrl: string, message: T) => {
+export const publish = <T>(topicUrl: string, message: T, headers?: StompHeaders) => {
     if (client) {
-        client.publish({ destination: topicUrl, body: JSON.stringify(message) })
+        client.publish({ destination: topicUrl, body: JSON.stringify(message), headers: headers })
     }
 };

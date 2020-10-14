@@ -8,6 +8,8 @@ import { Nullable } from '../models/nullable';
 import { User } from '../models/user';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
+import { WebSocketStatus } from '../store/web-socket/web-socket.reducer';
+import StartupScreen from '../screens/StartupScreen';
 
 const defaultNavOptions: StackNavigationOptions = {
     headerStyle: {
@@ -52,15 +54,21 @@ const UserNavigator = () => {
 
 const AppNavigator = () => {
 
+    const webSocketConnectionStatus = useSelector(
+        (state: RootState) => state.webSocketState.status
+    );
     const user: Nullable<User> = useSelector(
         (state: RootState) => state.userState.user
     );
 
     return (
         <NavigationContainer>
-            { user
-                ? <ChatNavigator/>
-                : <UserNavigator/>
+            {
+                webSocketConnectionStatus === WebSocketStatus.CONNECTED
+                    ? user
+                        ? <ChatNavigator/>
+                        : <UserNavigator/>
+                    : <StartupScreen/>
             }
         </NavigationContainer>
     );
