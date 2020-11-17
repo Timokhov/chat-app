@@ -1,7 +1,7 @@
 import React from 'react';
 import { TouchableNativeFeedback, View, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS } from '../../constants/colors';
+import { COLORS } from '../../../constants/colors';
 
 interface ToBottomButtonProps {
     onPress: () => void

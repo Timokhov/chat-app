@@ -1,8 +1,8 @@
 import React from 'react';
 import { Text, View, ViewStyle, StyleSheet } from 'react-native';
-import { COLORS } from '../../constants/colors';
+import { COLORS } from '../../../constants/colors';
 
-interface CountBadgeProps {
+export interface CountBadgeProps {
     count: number,
     style?: ViewStyle
 }

@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
-import { TextInput, StyleSheet, TextInputProps, NativeSyntheticEvent, TextInputFocusEventData } from 'react-native';
-import { COLORS } from '../../constants/colors';
+import {
+    TextInput,
+    StyleSheet,
+    TextInputProps,
+    NativeSyntheticEvent,
+    TextInputFocusEventData,
+    TextStyle, StyleProp
+} from 'react-native';
+import { COLORS } from '../../../constants/colors';
 
 const CustomTextInput = (props: TextInputProps) => {
 
@@ -16,12 +23,21 @@ const CustomTextInput = (props: TextInputProps) => {
         props.onBlur && props.onBlur(e);
     };
 
+    const textInputStyle: StyleProp<TextStyle> = [
+        styles.textInput, props.style
+    ];
+
+    if (isFocused) {
+        textInputStyle.push(styles.focused);
+    }
+
     return (
         <TextInput {...props}
-                   style={[ styles.textInput, isFocused && styles.focused, props.style ]}
+                   style={ textInputStyle }
                    selectionColor={ COLORS.primary }
                    onFocus={ onFocus }
-                   onBlur={ onBlur }/>
+                   onBlur={ onBlur }
+                   testID="InnerTextInput"/>
     );
 };
 

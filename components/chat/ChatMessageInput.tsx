@@ -9,7 +9,7 @@ import { Nullable } from '../../models/nullable';
 import { User } from '../../models/user';
 import * as DateService from '../../services/date.service';
 import { RootState } from '../../store/store';
-import CustomTextInput from '../ui/CustomTextInput';
+import CustomTextInput from '../ui/CustomTextInput/CustomTextInput';
 import * as WebSocketService from '../../services/web-socket.service';
 
 interface ChatMessageInputProps {

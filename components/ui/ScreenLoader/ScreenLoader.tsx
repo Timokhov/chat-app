@@ -1,6 +1,6 @@
 import React from 'react';
 import { ActivityIndicator, View, StyleSheet } from 'react-native';
-import { COLORS } from '../../constants/colors';
+import { COLORS } from '../../../constants/colors';
 
 
 const ScreenLoader = () => {

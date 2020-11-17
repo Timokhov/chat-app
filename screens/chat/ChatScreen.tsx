@@ -6,7 +6,7 @@ import {
 import { StackNavigationOptions, StackNavigationProp } from '@react-navigation/stack';
 import ChatMessageInput from '../../components/chat/ChatMessageInput';
 import ChatMessagesList, { ChatMessagesListRef } from '../../components/chat/ChatMessagesList';
-import ScreenLoader from '../../components/ui/ScreenLoader';
+import ScreenLoader from '../../components/ui/ScreenLoader/ScreenLoader';
 import { ChatNavigatorParams } from '../../navigation/AppNavigator';
 import { RouteProp } from '@react-navigation/native';
 import { Nullable } from '../../models/nullable';
@@ -15,7 +15,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { SubscriptionStatus } from '../../store/chat/chat.reducer';
 import { RootState } from '../../store/store';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
-import CustomHeaderButton from '../../components/ui/CustomHeaderButton';
+import CustomHeaderButton from '../../components/ui/CustomHeaderButton/CustomHeaderButton';
 import { Action, Dispatch } from 'redux';
 import * as UserActions from '../../store/user/user.actions';
 import { COLORS } from '../../constants/colors';

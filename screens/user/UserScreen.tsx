@@ -16,8 +16,8 @@ import { useDispatch } from 'react-redux';
 import 'react-native-get-random-values';
 import { v4 as uuid } from 'uuid';
 import * as UserActions from '../../store/user/user.actions';
-import CustomTextInput from '../../components/ui/CustomTextInput';
-import CustomButton from '../../components/ui/CustomButton';
+import CustomTextInput from '../../components/ui/CustomTextInput/CustomTextInput';
+import CustomButton from '../../components/ui/CustomButton/CustomButton';
 
 type UserScreenStackNavigationProp = StackNavigationProp<UserNavigatorParams, 'User'>;
 type UserScreenRouteProp = RouteProp<UserNavigatorParams, 'User'>;
@@ -69,7 +69,9 @@ const UserScreen = (props: UserScreenProps) => {
                     <CustomTextInput placeholder="Please Enter Your Name"
                                      onChangeText={ onNameInputChange }/>
                     <View style={ styles.buttonContainer }>
-                        <CustomButton onPress={ onEnterChat } disabled={ !name }/>
+                        <CustomButton label="Enter Chat"
+                                      onPress={ onEnterChat }
+                                      disabled={ !name }/>
                     </View>
                 </View>
             </KeyboardAvoidingView>

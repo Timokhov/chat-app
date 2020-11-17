@@ -17,8 +17,8 @@ import { RootState } from '../../store/store';
 import ChatMessageComponent from './ChatMessageComponent';
 import SystemChatMessageComponent from './SystemChatMessageComponent';
 import * as ChatActions from '../../store/chat/chat.actions';
-import ToBottomButton from '../ui/ToBottomButton';
-import CountBadge from '../ui/CountBadge';
+import ToBottomButton from '../ui/ToBottomButton/ToBottomButton';
+import CountBadge from '../ui/CountBadge/CountBadge';
 import TypingNotification from './TypingNotification';
 
 interface ViewableItemsChangedInfo {

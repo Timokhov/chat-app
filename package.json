@@ -5,7 +5,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "eject": "expo eject"
+    "eject": "expo eject",
+    "test": "jest"
   },
   "dependencies": {
     "@expo/vector-icons": "^10.0.0",
@@ -36,6 +37,8 @@
     "websocket": "^1.0.32"
   },
   "devDependencies": {
+    "@testing-library/react-native": "^7.1.0",
+    "@types/jest": "^26.0.15",
     "@types/react": "~16.9.35",
     "@types/react-dom": "~16.9.8",
     "@types/react-native": "~0.63.2",
@@ -45,8 +48,16 @@
     "@types/sockjs-client": "^1.1.1",
     "@types/text-encoding": "0.0.35",
     "@types/uuid": "^8.3.0",
+    "jest-expo": "^39.0.0",
     "react-native-web": "~0.13.7",
     "typescript": "~3.9.5"
+  },
+  "jest": {
+    "preset": "jest-expo",
+    "transformIgnorePatterns": [
+      "/node_modules/(?!native-base|@react-native-community/netinfo|@react-native-community/async-storage|@react-native-community/geolocation|react-native-permissions|uuid|react-native-get-random-values)/"
+    ],
+    "moduleFileExtensions": ["ts", "tsx", "js", "json", "jsx", "node"]
   },
   "private": true
 }
