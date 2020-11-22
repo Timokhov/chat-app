@@ -4,8 +4,8 @@ import {
     View
 } from 'react-native';
 import { StackNavigationOptions, StackNavigationProp } from '@react-navigation/stack';
-import ChatMessageInput from '../../components/chat/ChatMessageInput';
-import ChatMessagesList, { ChatMessagesListRef } from '../../components/chat/ChatMessagesList';
+import ChatMessageInput from '../../components/chat/ChatMessageInput/ChatMessageInput';
+import ChatMessagesList, { ChatMessagesListRef } from '../../components/chat/ChatMessagesList/ChatMessagesList';
 import ScreenLoader from '../../components/ui/ScreenLoader/ScreenLoader';
 import { ChatNavigatorParams } from '../../navigation/AppNavigator';
 import { RouteProp } from '@react-navigation/native';

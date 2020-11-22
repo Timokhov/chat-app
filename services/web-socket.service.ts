@@ -14,7 +14,7 @@ export const connectToWebSocket = (
 
     client = new Client({
         webSocketFactory: () => {
-            return new SockJS('https://localhost:8088/chat-service/socket/chat-service-socket');
+            return new SockJS('http://192.168.42.135:8088/chat-service/socket/chat-service-socket');
         },
         heartbeatIncoming: 0,
         heartbeatOutgoing: 20000,

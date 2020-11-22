@@ -1,7 +1,7 @@
 import React from 'react';
-import { ChatMessage } from '../../models/message';
-import { Text, StyleSheet } from 'react-native';
-import { COLORS } from '../../constants/colors';
+import { ChatMessage } from '../../../models/message';
+import { Text } from 'react-native';
+import { styles } from './SystemChatMessageComponent.styles';
 
 interface SystemMessageProps {
     message: ChatMessage
@@ -14,12 +14,5 @@ const SystemChatMessageComponent = (props: SystemMessageProps) => {
         </Text>
     );
 };
-
-const styles = StyleSheet.create({
-    systemMessage: {
-        fontSize: 16,
-        color: COLORS.common
-    }
-});
 
 export default SystemChatMessageComponent;

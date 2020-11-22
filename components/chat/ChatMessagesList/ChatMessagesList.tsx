@@ -10,16 +10,17 @@ import {
 } from 'react-native';
 import { Action, Dispatch } from 'redux';
 import { useDispatch, useSelector } from 'react-redux';
-import { ChatMessage, ChatMessageType } from '../../models/message';
-import { Nullable } from '../../models/nullable';
-import { User } from '../../models/user';
-import { RootState } from '../../store/store';
-import ChatMessageComponent from './ChatMessageComponent';
-import SystemChatMessageComponent from './SystemChatMessageComponent';
-import * as ChatActions from '../../store/chat/chat.actions';
-import ToBottomButton from '../ui/ToBottomButton/ToBottomButton';
-import CountBadge from '../ui/CountBadge/CountBadge';
-import TypingNotification from './TypingNotification';
+import { ChatMessage, ChatMessageType } from '../../../models/message';
+import { Nullable } from '../../../models/nullable';
+import { User } from '../../../models/user';
+import { RootState } from '../../../store/store';
+import ChatMessageComponent from '../ChatMessageComponent/ChatMessageComponent';
+import SystemChatMessageComponent from '../SystemChatMessageComponent/SystemChatMessageComponent';
+import * as ChatActions from '../../../store/chat/chat.actions';
+import ToBottomButton from '../../ui/ToBottomButton/ToBottomButton';
+import CountBadge from '../../ui/CountBadge/CountBadge';
+import TypingNotification from '../TypingNotification/TypingNotification';
+import { styles } from './ChatMessagesList.styles';
 
 interface ViewableItemsChangedInfo {
     viewableItems: Array<ViewToken>;
@@ -51,7 +52,7 @@ const ChatMessagesList = forwardRef<ChatMessagesListRef>((props: ChatMessagesLis
     );
     const typingNotification: string = useSelector(
         (state: RootState) => state.chatState.typingNotification
-    )
+    );
 
     const dispatch: Dispatch<Action> = useDispatch();
 
@@ -105,7 +106,7 @@ const ChatMessagesList = forwardRef<ChatMessagesListRef>((props: ChatMessagesLis
         return (
             <View style={ messageContainerStyle }>
                 <ChatMessageComponent message={ message }
-                             userMessage={ isUserMessage }
+                             currentUserMessage={ isUserMessage }
                              showSender={ !isPreviousMessageFromSameUser || isPreviousMessageSystem }/>
             </View>
         );
@@ -141,7 +142,7 @@ const ChatMessagesList = forwardRef<ChatMessagesListRef>((props: ChatMessagesLis
     }*/
 
     return (
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1 }} testID="ChatMessagesListContainerView">
             <FlatList ref={ flatListRef }
                       contentContainerStyle={ styles.chatMessagesList }
                       data={ chatMessages }
@@ -150,14 +151,15 @@ const ChatMessagesList = forwardRef<ChatMessagesListRef>((props: ChatMessagesLis
                       viewabilityConfig={ viewConfigRef.current }
                       onViewableItemsChanged={ onViewableItemsChangedRef.current }
                       ListHeaderComponent={ typingNotification
-                          ?  <TypingNotification notification={typingNotification}/>
+                          ?  <TypingNotification notification={ typingNotification }/>
                           : null
                       }
                       ListFooterComponentStyle={{ padding: 0, margin: 0 }}
-                      inverted/>
+                      inverted
+                      testID="MessagesFlatList"/>
             {
                 !isScrollAtBottom && (
-                    <View style={ styles.toBottomButtonContainer }>
+                    <View style={ styles.toBottomButtonContainer } testID="ScrollToBottomButtonView">
                         <ToBottomButton onPress={ scrollToBottom }/>
                         {
                             unreadChatMessagesIdList.length > 0 && <CountBadge style={ styles.unreadMessagesCountBadge }
@@ -168,34 +170,6 @@ const ChatMessagesList = forwardRef<ChatMessagesListRef>((props: ChatMessagesLis
             }
         </View>
     );
-});
-
-const styles = StyleSheet.create({
-    chatMessagesList: {
-        flexGrow: 1,
-        justifyContent: 'flex-end'
-    },
-    chatMessageContainer: {
-        maxWidth: '80%'
-    },
-    systemMessageContainer: {
-        width: '100%',
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingHorizontal: 40,
-        marginVertical: 15
-    },
-    toBottomButtonContainer: {
-        position: 'absolute',
-        justifyContent: 'center',
-        alignItems: 'center',
-        bottom: 10,
-        right: 10
-    },
-    unreadMessagesCountBadge: {
-        position: 'absolute',
-        top: -10
-    }
 });
 
 export default ChatMessagesList;
